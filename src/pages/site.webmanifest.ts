@@ -17,8 +17,8 @@ export const GET: APIRoute = () => {
     start_url: withBase('/'),
     scope: withBase('/'),
     display: 'standalone',
-    background_color: '#0e0c0b',
-    theme_color: '#0e0c0b',
+    background_color: '#f4f1ec',
+    theme_color: '#f4f1ec',
     lang: dict.meta.locale,
     icons: [
       { src: withBase('/icon.svg'), sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
