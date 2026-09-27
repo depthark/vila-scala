@@ -24,15 +24,24 @@ function initTheme() {
     }
   };
 
+  // Tint the browser chrome with the active page background.
+  const apply = (theme: string) => {
+    root.dataset.theme = theme;
+    const bg = getComputedStyle(root).getPropertyValue('--c-bg').trim();
+    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+      meta.setAttribute('content', bg);
+    });
+  };
+
   // Follow the OS until the visitor makes an explicit choice.
   media.addEventListener('change', (e) => {
-    if (!read()) root.dataset.theme = e.matches ? 'dark' : 'light';
+    if (!read()) apply(e.matches ? 'dark' : 'light');
   });
 
   document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      root.dataset.theme = next;
+      apply(next);
       btn.setAttribute('aria-pressed', String(next === 'dark'));
       try {
         localStorage.setItem('vs-theme', next);

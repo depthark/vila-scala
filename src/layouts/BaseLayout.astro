@@ -54,7 +54,12 @@ const dict = t(locale);
           stored = localStorage.getItem('vs-theme');
         } catch {}
         const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        root.dataset.theme = stored === 'light' || stored === 'dark' ? stored : system;
+        const theme = stored === 'light' || stored === 'dark' ? stored : system;
+        root.dataset.theme = theme;
+        // The browser chrome follows the site's theme, not just the OS one.
+        document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+          meta.setAttribute('content', theme === 'dark' ? '#0e0c0b' : '#f4f1ec');
+        });
       })();
     </script>
   </head>

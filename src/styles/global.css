@@ -101,6 +101,8 @@
   }
 
   html {
+    /* Safari 26 tints its bars from the root background, not theme-color. */
+    background-color: var(--color-bg);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
     /* The sticky header must never hide a focused or scrolled-to target. */
@@ -122,7 +124,9 @@
      and a printed page. Purely decorative, never intercepts a pointer. */
   body::after {
     content: '';
-    position: fixed;
+    /* Absolute, not fixed: a full-screen fixed layer is what Safari 26
+       samples for its bar colour, and this one is transparent. */
+    position: absolute;
     inset: 0;
     z-index: 90;
     pointer-events: none;
