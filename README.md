@@ -16,7 +16,7 @@ site as a static, bilingual, accessible Astro project.
 | Styling | Tailwind CSS 4 (`@theme` tokens, no config file) |
 | Runtime / package manager | [Bun](https://bun.sh) for installs and scripts; Node 24 LTS (`.nvmrc`) runs the Astro CLI |
 | Images | `astro:assets` + sharp — AVIF/WebP, responsive `srcset`, build-time |
-| Fonts | Self-hosted Cormorant Garamond (display) + Inter Variable (UI) |
+| Fonts | Self-hosted Manrope (display, from Google Fonts) + Inter Variable (UI) |
 | Hosting | GitHub Pages via GitHub Actions |
 
 The client-side budget is one small module: theme persistence, the mobile

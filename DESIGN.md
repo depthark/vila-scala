@@ -39,9 +39,13 @@ pair was measured, not eyeballed:
 
 **Typography.** The generated pairing was Cinzel / Josefin Sans. Cinzel is
 capitals-only, which fails on Czech sentence-case headings and reads poorly at
-length. Cormorant Garamond keeps the same elegance, ships a real latin-ext
-subset for Czech diacritics, and works in lowercase. Inter Variable carries the
-UI. Both are self-hosted.
+length. A first pass used Cormorant Garamond, but its tall, steep acutes looked
+detached from ý and á at display size. Headings now use Manrope, a restrained
+geometric grotesk with compact, well-seated Czech diacritics, set at weight 500
+with tight tracking so the oversized display lines read as architecture rather
+than ornament. Inter Variable carries the UI. Manrope's variable woff2 files
+(latin + latin-ext) are downloaded from Google Fonts and self-hosted from
+`src/assets/fonts/`; Inter comes from Fontsource.
 
 **Style.** The generated style was Glassmorphism. Frosted panels would sit
 badly against this photography and add blur cost for nothing. The build instead
