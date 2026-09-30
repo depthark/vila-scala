@@ -227,7 +227,8 @@
     font-weight: 600;
     color: var(--color-text);
   }
-  .prose-vs a {
+  /* Buttons placed in a prose column are controls, not inline links. */
+  .prose-vs a:not(.button-link) {
     color: var(--color-accent-text);
     text-underline-offset: 3px;
     text-decoration-line: underline;
