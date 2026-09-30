@@ -29,10 +29,12 @@ const desktopItems = items.filter((item) => item.key !== 'home');
   data-over-hero={overHero ? 'true' : undefined}
   class="site-header sticky top-0 z-50 border-b border-line/70 bg-bg/85 backdrop-blur-md transition-[background-color,border-color] duration-500 ease-[var(--ease-editorial)] supports-[backdrop-filter]:bg-bg/70"
 >
-  <div class="container-page flex h-[var(--header-h)] items-center justify-between gap-4">
+  <!-- On lg the nav sits in a 1fr/auto/1fr grid, so it is centred on the page
+       rather than between a narrow logo and a wide control cluster. -->
+  <div class="container-page flex h-[var(--header-h)] items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr]">
     <a
       href={path('home', locale)}
-      class="flex min-h-11 shrink-0 items-center"
+      class="flex min-h-11 shrink-0 items-center lg:justify-self-start"
       aria-label={dict.a11y.homeLink}
     >
       <Image
@@ -75,7 +77,7 @@ const desktopItems = items.filter((item) => item.key !== 'home');
       </ul>
     </nav>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 lg:justify-self-end">
       <div class="hidden sm:block"><LocaleSwitch locale={locale} routeKey={routeKey} slug={slug} /></div>
       <ThemeToggle locale={locale} />
       <a
