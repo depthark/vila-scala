@@ -14,7 +14,7 @@ site as a static, bilingual, accessible Astro project.
 |---|---|
 | Framework | [Astro 7](https://astro.build) — static output, zero framework runtime |
 | Styling | Tailwind CSS 4 (`@theme` tokens, no config file) |
-| Runtime / package manager | [Bun](https://bun.sh) |
+| Runtime / package manager | [Bun](https://bun.sh) for installs and scripts; Node 24 LTS (`.nvmrc`) runs the Astro CLI |
 | Images | `astro:assets` + sharp — AVIF/WebP, responsive `srcset`, build-time |
 | Fonts | Self-hosted Cormorant Garamond (display) + Inter Variable (UI) |
 | Hosting | GitHub Pages via GitHub Actions |
@@ -26,6 +26,7 @@ validation. No framework, no polyfills, no analytics.
 ## Getting started
 
 ```bash
+nvm use            # Node 24 LTS, from .nvmrc
 bun install
 bun run dev        # http://localhost:4321
 ```
@@ -103,7 +104,7 @@ For static files under `public/`, wrap the URL in `withBase()`.
 
 ## Deployment
 
-Pushing to `main` runs `.github/workflows/static.yml`: Bun install →
+Pushing to `main` runs `.github/workflows/static.yml`: Node LTS + Bun setup → install →
 type-check → build → publish to GitHub Pages. It can also be triggered by
 hand from the Actions tab.
 

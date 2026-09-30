@@ -32,6 +32,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Astro's CLI runs under Node (bun run honours its node shebang), so pin
+      # it to the Active LTS line from .nvmrc rather than the runner default.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
