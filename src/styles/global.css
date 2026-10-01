@@ -375,6 +375,22 @@
   overflow: hidden;
 }
 
+/* 360° tour: the frame fills the stage edge to edge on soot, not on the
+   default white HTML panel, and keeps a slim gutter on phones. */
+.vila-tour {
+  --f-html-bg: #0b0908;
+  --f-html-padding: 0;
+}
+.vila-tour .has-iframe {
+  padding: clamp(0.5rem, 3vw, 2rem);
+}
+.vila-tour .has-iframe .f-html {
+  max-width: 1600px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.7);
+}
+
 /* View timelines are Limited Availability, so the animation is isolated in
    a feature query. Unsupported browsers keep the complete content visible. */
 @media (prefers-reduced-motion: no-preference) {

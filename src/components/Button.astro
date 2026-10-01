@@ -1,5 +1,7 @@
 ---
-interface Props {
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'href' | 'class' | 'download'> {
   href: string;
   variant?: 'primary' | 'secondary' | 'ghost' | 'onDark';
   external?: boolean;
@@ -14,6 +16,7 @@ const {
   download = false,
   class: className = '',
   ariaLabel,
+  ...attrs
 } = Astro.props;
 
 const styles = {
@@ -26,6 +29,7 @@ const styles = {
 ---
 
 <a
+  {...attrs}
   href={href}
   aria-label={ariaLabel}
   download={download || undefined}

@@ -9,10 +9,12 @@ import Section from '../components/Section.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import StatusBadge from '../components/StatusBadge.astro';
 import UnitCard from '../components/UnitCard.astro';
+import Icon360 from '../components/Icon360.astro';
+import UnitTour from '../components/UnitTour.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 import { site } from '../data/site';
-import { units, type Unit } from '../data/units';
+import { tourEmbedUrl, units, type Unit } from '../data/units';
 import { fmt, path, t, tu, siteRoot, type Locale } from '../i18n';
 
 interface Props {
@@ -46,6 +48,15 @@ const specs = [
   { label: dict.units.totalUsableArea, value: `${nf.format(unit.areas.totalUsable)} m²` },
   ...(unit.studio ? [{ label: dict.units.designStudio, value: unit.studio }] : []),
 ];
+
+/* The 360° stage, when there is one, becomes section 01 and pushes the rest down. */
+const tourAnchor = locale === 'cs' ? 'prohlidka-360' : 'tour-360';
+let sectionNo = 0;
+const nextIndex = () => String(++sectionNo).padStart(2, '0');
+const tourIndex = unit.tourUrl ? nextIndex() : undefined;
+const planIndex = nextIndex();
+const galleryIndex = nextIndex();
+const othersIndex = nextIndex();
 
 const others = units.filter((u) => u.slug !== unit.slug).slice(0, 3);
 
@@ -101,7 +112,27 @@ const galleryItems = unit.gallery.map((src, i) => ({
   schema={schema}
   overHero
 >
-  <Hero image={unit.hero} alt={`${heading} — ${c.title}`} eyebrow={heading} title={c.title} />
+  <Hero image={unit.hero} alt={`${heading} — ${c.title}`} eyebrow={heading} title={c.title}>
+    {
+      unit.tourUrl && (
+        <div class="reveal mt-8" data-reveal-delay="200">
+          <Button
+            href={unit.tourUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-tour-open
+            data-src={tourEmbedUrl(unit.tourUrl)}
+            data-type="iframe"
+            data-caption={fmt(dict.units.tourFrameTitle, { unit: unit.number })}
+            class="min-h-14 px-7 text-base shadow-[0_12px_40px_-8px_rgb(0_0_0/0.55)]"
+          >
+            <Icon360 class="size-6" />
+            {dict.units.tourHeroCta}
+          </Button>
+        </div>
+      )
+    }
+  </Hero>
 
   <Breadcrumbs locale={locale} trail={[{ key: 'units' }]} current={`${heading}`} />
 
@@ -164,18 +195,50 @@ const galleryItems = unit.gallery.map((src, i) => ({
             <Button href={unit.pdf} variant="secondary" download class="w-full">
               {dict.cta.downloadPdf}
             </Button>
-            <Button href={site.virtualTourUrl} variant="ghost" external class="w-full">
-              {dict.cta.virtualTour}
-            </Button>
+            {
+              unit.tourUrl ? (
+                <Button
+                  href={unit.tourUrl}
+                  variant="secondary"
+                  data-tour-open
+                  data-src={tourEmbedUrl(unit.tourUrl)}
+                  data-type="iframe"
+                  data-caption={fmt(dict.units.tourFrameTitle, { unit: unit.number })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="w-full"
+                >
+                  <Icon360 class="size-5" />
+                  {dict.cta.unitTour}
+                </Button>
+              ) : (
+                <Button href={site.virtualTourUrl} variant="ghost" external class="w-full">
+                  {dict.cta.virtualTour}
+                </Button>
+              )
+            }
           </div>
         </div>
       </aside>
     </div>
   </Section>
 
+  {
+    unit.tourUrl && (
+      <UnitTour
+        locale={locale}
+        url={unit.tourUrl}
+        poster={unit.hero}
+        unit={unit.number}
+        anchor={tourAnchor}
+        index={tourIndex}
+      />
+    )
+  }
+
   <!-- Floor plan --------------------------------------------------------- -->
   <Section tone="surface" labelledby="unit-plan-title">
-    <SectionHeading id="unit-plan-title" index="01" eyebrow={heading} title={dict.units.floorplan} />
+    <SectionHeading id="unit-plan-title" index={planIndex} eyebrow={heading} title={dict.units.floorplan} />
     <figure class="reveal mt-10">
       <a href={unit.pdf} download class="block overflow-hidden rounded-card bg-bg p-3 sm:p-6">
         <Image
@@ -200,7 +263,7 @@ const galleryItems = unit.gallery.map((src, i) => ({
   <Section labelledby="unit-gallery-title">
     <SectionHeading
       id="unit-gallery-title"
-      index="02"
+      index={galleryIndex}
       eyebrow={heading}
       title={`${dict.units.gallery} ${fmt(dict.units.ofUnit, { unit: unit.number })}`}
     />
@@ -209,7 +272,7 @@ const galleryItems = unit.gallery.map((src, i) => ({
 
   <!-- Other units -------------------------------------------------------- -->
   <Section tone="surface" labelledby="other-units-title">
-    <SectionHeading id="other-units-title" index="03" eyebrow={dict.nav.units} title={dict.unitsPage.tableTitle} />
+    <SectionHeading id="other-units-title" index={othersIndex} eyebrow={dict.nav.units} title={dict.unitsPage.tableTitle} />
     <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {others.map((u, i) => <UnitCard locale={locale} unit={u} index={i} />)}
     </div>

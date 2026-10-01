@@ -55,6 +55,8 @@ export interface Unit {
   plan: ImageMetadata;
   gallery: ImageMetadata[];
   pdf: string;
+  /** The apartment's own Matterport 360° tour; the building tour otherwise. */
+  tourUrl?: string;
 }
 
 export const units: Unit[] = [
@@ -122,6 +124,7 @@ export const units: Unit[] = [
     plan: plan3,
     gallery: [unit3Living, livingDark, kitchen, viewSvratka, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-3.pdf'),
+    tourUrl: 'https://my.matterport.com/show/?m=9TRujB6gbEi',
   },
   {
     slug: '1039-4',
@@ -141,6 +144,7 @@ export const units: Unit[] = [
     plan: plan4,
     gallery: [unit4Living, atticLiving, atticBath, viewSvratka],
     pdf: withBase('/docs/vila-scala-jednotka-1039-4.pdf'),
+    tourUrl: 'https://my.matterport.com/show/?m=SEqfAMtKMNL',
   },
   {
     slug: '1039-5',
@@ -159,6 +163,14 @@ export const units: Unit[] = [
     pdf: withBase('/docs/vila-scala-jednotka-1039-5.pdf'),
   },
 ];
+
+/** Matterport link for the lightbox: starts at once, skips the fly-in intro. */
+export function tourEmbedUrl(url: string): string {
+  const embed = new URL(url);
+  embed.searchParams.set('play', '1');
+  embed.searchParams.set('qs', '1');
+  return embed.toString();
+}
 
 export const getUnit = (slug: string) => units.find((u) => u.slug === slug);
 

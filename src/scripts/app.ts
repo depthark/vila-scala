@@ -398,6 +398,42 @@ function initCookieConsent() {
   if (!read()) open();
 }
 
+/* ---------------------------------------------------------- 360 tour ---- */
+
+/* The Matterport tour opens over the page in the same lightbox as the
+   galleries, so visitors never leave the apartment they are looking at.
+   Nothing from Matterport loads until one of the triggers is clicked. */
+function initTour() {
+  if (!document.querySelector('[data-tour-open]')) return;
+
+  Fancybox.bind('[data-tour-open]', {
+    l10n: document.documentElement.lang.startsWith('cs') ? csFancybox : en_EN,
+    mainClass: 'vila-fancybox vila-tour',
+    theme: 'dark',
+    placeFocusBack: true,
+    // Dragging belongs to the tour inside the frame, not to the lightbox.
+    dragToClose: false,
+    zoomEffect: false,
+    showClass: prefersReducedMotion() ? false : 'f-fadeIn',
+    hideClass: prefersReducedMotion() ? false : 'f-fadeOut',
+    Carousel: {
+      Thumbs: false,
+      Html: {
+        iframeAttr: {
+          allow: 'autoplay; fullscreen; xr-spatial-tracking; gyroscope; accelerometer',
+          allowfullscreen: 'true',
+        },
+      },
+      Toolbar: {
+        display: {
+          left: [],
+          right: ['fullscreen', 'close'],
+        },
+      },
+    },
+  });
+}
+
 /* -------------------------------------------------------------- boot ---- */
 
 const boot = () => {
@@ -408,6 +444,7 @@ const boot = () => {
   initHeroVideo();
   initMarquee();
   initContactForm();
+  initTour();
   initCookieConsent();
 };
 
