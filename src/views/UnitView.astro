@@ -97,8 +97,8 @@ const schema = [
   },
 ];
 
-const galleryItems = unit.gallery.map((src, i) => ({
-  src,
+const galleryItems = unit.gallery.map((photo, i) => ({
+  ...('day' in photo ? { src: photo.day, night: photo.night } : { src: photo }),
   alt: `${heading} — ${c.title} (${i + 1}/${unit.gallery.length})`,
 }));
 ---

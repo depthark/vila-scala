@@ -376,19 +376,147 @@
 }
 
 /* 360° tour: the frame fills the stage edge to edge on soot, not on the
-   default white HTML panel, and keeps a slim gutter on phones. */
+   default white HTML panel, and keeps a slim gutter on phones. The top
+   gutter is reserved for the toolbar, so the close button never sits on
+   the tour or under a phone's status bar. */
 .vila-tour {
   --f-html-bg: #0b0908;
   --f-html-padding: 0;
 }
-.vila-tour .has-iframe {
-  padding: clamp(0.5rem, 3vw, 2rem);
+.vila-tour .fancybox__slide.has-iframe {
+  padding: calc(env(safe-area-inset-top, 0px) + 4rem) clamp(0.5rem, 3vw, 2rem) clamp(0.5rem, 3vw, 2rem);
 }
-.vila-tour .has-iframe .f-html {
+.vila-tour .f-carousel__toolbar {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.vila-tour .f-button {
+  --f-button-width: 48px;
+  --f-button-height: 48px;
+  --f-button-bg: rgb(244 239 232 / 0.16);
+}
+.vila-tour .fancybox__slide.has-iframe .f-html {
   max-width: 1600px;
   border-radius: var(--radius-card);
   overflow: hidden;
   box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.7);
+}
+
+/* ---------------------------------------------------------------------- *
+ * Day / night before-after slider, shown inside the gallery lightbox.
+ * The night photo sits on top, clipped from the left at --pos; app.ts
+ * moves --pos from pointer drags and from the (keyboard) range input.
+ * ---------------------------------------------------------------------- */
+.fancybox__slide:has(.vs-compare) .f-html {
+  padding: 0;
+  background: transparent;
+}
+.vs-compare {
+  position: relative;
+  width: min(92vw, 1600px, calc((100svh - 11rem) * var(--ar)));
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #0b0908;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.vs-compare__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.vs-compare__night {
+  clip-path: inset(0 0 0 var(--pos));
+}
+.vs-compare::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: var(--pos);
+  width: 2px;
+  translate: -1px 0;
+  background: #f6f2ec;
+  box-shadow: 0 0 14px rgb(0 0 0 / 0.55);
+  pointer-events: none;
+}
+.vs-compare__handle {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: var(--pos);
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  background: #f6f2ec;
+  color: #0b0908;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+  pointer-events: none;
+}
+.vs-compare__handle svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.vs-compare:has(.vs-compare__range:focus-visible) .vs-compare__handle {
+  outline: 3px solid #dc8a55;
+  outline-offset: 3px;
+}
+.vs-compare__label {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgb(11 9 8 / 0.65);
+  color: #f6f2ec;
+  font: 600 0.6875rem/1.2 var(--font-sans);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.vs-compare__label--day {
+  left: 1rem;
+}
+.vs-compare__label--night {
+  right: 1rem;
+}
+/* On phones the carousel arrows would sit on the slider itself; the
+   thumbnail strip carries navigation while a day/night slide is shown. */
+@media (max-width: 47.99rem) {
+  .fancybox__container:has(.fancybox__slide.is-selected .vs-compare) .f-button.is-arrow {
+    display: none;
+  }
+  .vs-compare__label {
+    top: 0.625rem;
+  }
+  .vs-compare__label--day {
+    left: 0.625rem;
+  }
+  .vs-compare__label--night {
+    right: 0.625rem;
+  }
+  .vs-compare__handle {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+/* Present for keyboards and screen readers; pointers are handled in JS. */
+.vs-compare__range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* View timelines are Limited Availability, so the animation is isolated in

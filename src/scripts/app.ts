@@ -398,6 +398,75 @@ function initCookieConsent() {
   if (!read()) open();
 }
 
+/* ------------------------------------------------------ day / night ---- */
+
+/* Before/after slider inside the gallery lightbox. Pointer drags are taken
+   in the capture phase so Fancybox never sees them as a swipe to the next
+   photo; the hidden range input carries keyboard and screen reader use. */
+function initCompare() {
+  const setPos = (compare: HTMLElement, pct: number) => {
+    const pos = Math.min(100, Math.max(0, pct));
+    compare.style.setProperty('--pos', `${pos}%`);
+    const range = compare.querySelector<HTMLInputElement>('.vs-compare__range');
+    if (range) range.value = String(Math.round(pos));
+  };
+  const fromPointer = (compare: HTMLElement, event: PointerEvent) => {
+    const box = compare.getBoundingClientRect();
+    setPos(compare, ((event.clientX - box.left) / box.width) * 100);
+  };
+
+  document.addEventListener(
+    'pointerdown',
+    (event) => {
+      const compare = (event.target as Element | null)?.closest?.<HTMLElement>('[data-compare]');
+      if (!compare || event.button > 0) return;
+      event.stopPropagation();
+      event.preventDefault();
+      compare.querySelector<HTMLInputElement>('.vs-compare__range')?.focus({ preventScroll: true });
+      compare.setPointerCapture(event.pointerId);
+      fromPointer(compare, event);
+
+      const move = (e: PointerEvent) => fromPointer(compare, e);
+      const end = () => {
+        compare.removeEventListener('pointermove', move);
+        compare.removeEventListener('pointerup', end);
+        compare.removeEventListener('pointercancel', end);
+      };
+      compare.addEventListener('pointermove', move);
+      compare.addEventListener('pointerup', end);
+      compare.addEventListener('pointercancel', end);
+    },
+    true,
+  );
+
+  // Older touch paths in the carousel listen for these directly.
+  for (const type of ['touchstart', 'mousedown'] as const) {
+    document.addEventListener(
+      type,
+      (event) => {
+        if ((event.target as Element | null)?.closest?.('[data-compare]')) event.stopPropagation();
+      },
+      { capture: true, passive: true },
+    );
+  }
+
+  document.addEventListener('input', (event) => {
+    const range = event.target as HTMLInputElement;
+    if (!range.matches?.('.vs-compare__range')) return;
+    const compare = range.closest<HTMLElement>('[data-compare]');
+    if (compare) setPos(compare, Number(range.value));
+  });
+
+  // Arrow keys on the slider move the slider, not the gallery.
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if ((event.target as Element | null)?.matches?.('.vs-compare__range')) event.stopPropagation();
+    },
+    true,
+  );
+}
+
 /* ---------------------------------------------------------- 360 tour ---- */
 
 /* The Matterport tour opens over the page in the same lightbox as the
@@ -414,6 +483,10 @@ function initTour() {
     // Dragging belongs to the tour inside the frame, not to the lightbox.
     dragToClose: false,
     zoomEffect: false,
+    // The toolbar carries the close button; never fade it out, because
+    // touches inside the tour frame never reach Fancybox to bring it back.
+    idle: false,
+    closeButton: false,
     showClass: prefersReducedMotion() ? false : 'f-fadeIn',
     hideClass: prefersReducedMotion() ? false : 'f-fadeOut',
     Carousel: {
@@ -424,9 +497,13 @@ function initTour() {
           allowfullscreen: 'true',
         },
       },
+      // "auto" would only enable it for zoomable images, so an iframe slide
+      // would get no toolbar, and no close button, at all.
       Toolbar: {
+        enabled: true,
         display: {
           left: [],
+          middle: [],
           right: ['fullscreen', 'close'],
         },
       },
@@ -445,6 +522,7 @@ const boot = () => {
   initMarquee();
   initContactForm();
   initTour();
+  initCompare();
   initCookieConsent();
 };
 

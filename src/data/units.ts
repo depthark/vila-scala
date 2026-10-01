@@ -25,6 +25,33 @@ import cortenPlanters from '../assets/images/corten-planters.jpg';
 import rockGarden from '../assets/images/rock-garden.jpg';
 import wine1 from '../assets/images/wine-cellar-1.jpg';
 
+/** A gallery photo, or a day photo paired with the same view by night. */
+export type UnitPhoto = ImageMetadata | { day: ImageMetadata; night: ImageMetadata };
+
+/*
+ * Day/night visualisations live in assets/images/units/<slug>/ as AVIF:
+ * pair-NN-day.avif + pair-NN-night.avif (aligned to the same frame, shown
+ * as a before/after slider) and night-NN.avif (night views with no day twin).
+ */
+const unitPhotos = import.meta.glob<{ default: ImageMetadata }>('../assets/images/units/*/*.avif', {
+  eager: true,
+});
+
+function dayNight(slug: string): UnitPhoto[] {
+  const files = Object.entries(unitPhotos)
+    .filter(([file]) => file.includes(`/units/${slug}/`))
+    .sort(([a], [b]) => a.localeCompare(b));
+  const byName = new Map(files.map(([file, mod]) => [file.split('/').pop()!, mod.default]));
+  const pairs = [...byName]
+    .filter(([name]) => name.endsWith('-day.avif'))
+    .map(([name, day]): UnitPhoto => {
+      const night = byName.get(name.replace('-day.avif', '-night.avif'));
+      return night ? { day, night } : day;
+    });
+  const nights = [...byName].filter(([name]) => /^night-\d+\.avif$/.test(name)).map(([, img]) => img);
+  return [...pairs, ...nights];
+}
+
 export type UnitStatus = 'available' | 'soon' | 'sold';
 
 export interface Unit {
@@ -53,7 +80,7 @@ export interface Unit {
   studioUrl?: string;
   hero: ImageMetadata;
   plan: ImageMetadata;
-  gallery: ImageMetadata[];
+  gallery: UnitPhoto[];
   pdf: string;
   /** The apartment's own Matterport 360° tour; the building tour otherwise. */
   tourUrl?: string;
@@ -80,8 +107,10 @@ export const units: Unit[] = [
     studioUrl: 'https://www.designatak.cz',
     hero: unit1Living,
     plan: plan1,
-    gallery: [unit1Living, kitchen, terrace1, cortenPlanters, viewSvratka, wine1],
+    gallery: [...dayNight('1039-1'), unit1Living, kitchen, terrace1, cortenPlanters, viewSvratka, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-1.pdf'),
+    // Matterport: "2+kk – byt vlevo" (left of the pair, facing the house).
+    tourUrl: 'https://my.matterport.com/show/?m=wshBMwZgJWX',
   },
   {
     slug: '1039-2',
@@ -102,6 +131,8 @@ export const units: Unit[] = [
     plan: plan2,
     gallery: [unit2Living, terrace2, rockGarden, cortenPlanters, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-2.pdf'),
+    // Matterport: "2+kk – byt vpravo" (right of the pair, facing the house).
+    tourUrl: 'https://my.matterport.com/show/?m=aoyxHcrqaw6',
   },
   {
     slug: '1039-3',
@@ -122,7 +153,7 @@ export const units: Unit[] = [
     studioUrl: 'https://www.oooox.com',
     hero: unit3Living,
     plan: plan3,
-    gallery: [unit3Living, livingDark, kitchen, viewSvratka, wine1],
+    gallery: [...dayNight('1039-3'), unit3Living, livingDark, kitchen, viewSvratka, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-3.pdf'),
     tourUrl: 'https://my.matterport.com/show/?m=9TRujB6gbEi',
   },

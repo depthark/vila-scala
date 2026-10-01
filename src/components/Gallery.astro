@@ -6,6 +6,9 @@ import { t, type Locale } from '../i18n';
 export interface GalleryItem {
   src: ImageMetadata;
   alt: string;
+  /** The same view by night. The thumbnail stays the day photo; the
+      lightbox opens a before/after slider between the two. */
+  night?: ImageMetadata;
 }
 
 interface Props {
@@ -31,11 +34,16 @@ const {
 const dict = t(locale);
 
 // Full-resolution (but still optimised) sources for the lightbox.
-const full = await Promise.all(
-  items.map((item) =>
-    getImage({ src: item.src, format: 'webp', quality: 82, width: Math.min(item.src.width, 2000) }),
-  ),
+const lightbox = (src: ImageMetadata) =>
+  getImage({ src, format: 'avif', quality: 62, width: Math.min(src.width, 2000) });
+const full = await Promise.all(items.map((item) => lightbox(item.src)));
+const nights = await Promise.all(items.map((item) => (item.night ? lightbox(item.night) : undefined)));
+const thumbs = await Promise.all(
+  items.map((item) => getImage({ src: item.src, format: 'avif', quality: 55, width: 240 })),
 );
+
+// Unique per gallery on the page, so inline compare panels never collide.
+const uid = `g${Math.random().toString(36).slice(2, 8)}`;
 
 // A repeating rhythm that keeps the grid interesting without art-directing
 // every single tile by hand.
@@ -61,10 +69,15 @@ const spans = ['sm:col-span-4', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-4
           data-fancybox="vila-gallery"
           data-caption={item.alt}
           data-alt={item.alt}
-          data-width={full[i].attributes.width ?? item.src.width}
-          data-height={full[i].attributes.height ?? item.src.height}
-          class="button-link block w-full cursor-zoom-in overflow-hidden rounded-card bg-surface"
-          aria-label={`${dict.a11y.openGallery}: ${item.alt}`}
+          data-thumb={thumbs[i].src}
+          {...(nights[i]
+            ? { 'data-src': `#${uid}-${i}`, 'data-type': 'inline' }
+            : {
+                'data-width': full[i].attributes.width ?? item.src.width,
+                'data-height': full[i].attributes.height ?? item.src.height,
+              })}
+          class="button-link relative block w-full cursor-zoom-in overflow-hidden rounded-card bg-surface"
+          aria-label={`${nights[i] ? dict.a11y.compareOpen : dict.a11y.openGallery}: ${item.alt}`}
         >
           <Image
             src={item.src}
@@ -81,8 +94,67 @@ const spans = ['sm:col-span-4', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-4
                 : 'object-cover group-hover:scale-[1.03]',
             ]}
           />
+          {
+            nights[i] && (
+              <span class="pointer-events-none absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-[#0b0908]/70 px-3 py-1.5 text-xs font-medium text-[#f6f2ec] backdrop-blur-sm">
+                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2" />
+                </svg>
+                {dict.a11y.compareDay} / {dict.a11y.compareNight}
+                <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+                </svg>
+              </span>
+            )
+          }
         </a>
         <figcaption class="sr-only">{item.alt}</figcaption>
+        {
+          nights[i] && (
+            <div hidden>
+              <div
+                id={`${uid}-${i}`}
+                class="vs-compare"
+                data-compare
+                style={`--pos: 50%; aspect-ratio: ${item.src.width} / ${item.src.height}; --ar: ${item.src.width / item.src.height};`}
+              >
+                <img
+                  src={full[i].src}
+                  alt={`${item.alt} — ${dict.a11y.compareDay}`}
+                  width={full[i].attributes.width}
+                  height={full[i].attributes.height}
+                  class="vs-compare__img"
+                  draggable="false"
+                />
+                <img
+                  src={nights[i]!.src}
+                  alt={`${item.alt} — ${dict.a11y.compareNight}`}
+                  width={nights[i]!.attributes.width}
+                  height={nights[i]!.attributes.height}
+                  class="vs-compare__img vs-compare__night"
+                  draggable="false"
+                />
+                <span class="vs-compare__label vs-compare__label--day">{dict.a11y.compareDay}</span>
+                <span class="vs-compare__label vs-compare__label--night">{dict.a11y.compareNight}</span>
+                <span class="vs-compare__handle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 6-6 6 6 6M15 6l6 6-6 6" />
+                  </svg>
+                </span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="50"
+                  class="vs-compare__range"
+                  aria-label={dict.a11y.compareRange}
+                />
+              </div>
+            </div>
+          )
+        }
       </figure>
     ))
   }
