@@ -10,11 +10,12 @@ import SectionHeading from '../components/SectionHeading.astro';
 import StatusBadge from '../components/StatusBadge.astro';
 import UnitCard from '../components/UnitCard.astro';
 import Icon360 from '../components/Icon360.astro';
+import UnitPanoramas from '../components/UnitPanoramas.astro';
 import UnitTour from '../components/UnitTour.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 import { site } from '../data/site';
-import { tourEmbedUrl, units, type Unit } from '../data/units';
+import { panoramasFor, tourEmbedUrl, units, type Unit } from '../data/units';
 import { fmt, path, t, tu, siteRoot, type Locale } from '../i18n';
 
 interface Props {
@@ -54,6 +55,8 @@ const tourAnchor = locale === 'cs' ? 'prohlidka-360' : 'tour-360';
 let sectionNo = 0;
 const nextIndex = () => String(++sectionNo).padStart(2, '0');
 const tourIndex = unit.tourUrl ? nextIndex() : undefined;
+const panoramas = panoramasFor(unit.slug);
+const panoIndex = panoramas.length ? nextIndex() : undefined;
 const planIndex = nextIndex();
 const galleryIndex = nextIndex();
 const othersIndex = nextIndex();
@@ -233,6 +236,12 @@ const galleryItems = unit.gallery.map((photo, i) => ({
         anchor={tourAnchor}
         index={tourIndex}
       />
+    )
+  }
+
+  {
+    panoramas.length > 0 && (
+      <UnitPanoramas locale={locale} panoramas={panoramas} unit={unit.number} slug={unit.slug} index={panoIndex} />
     )
   }
 

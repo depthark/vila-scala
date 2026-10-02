@@ -511,6 +511,73 @@ function initTour() {
   });
 }
 
+/* -------------------------------------------------------- panoramas ---- */
+
+/* 360° renders open in the lightbox and are drawn by Photo Sphere Viewer.
+   It brings three.js with it, so both are fetched only when a panorama is
+   actually opened. Swiping between slides is off: a drag looks around. */
+function initPanoramas() {
+  if (!document.querySelector('[data-pano-open]')) return;
+
+  type Viewer = { destroy(): void };
+  const viewers = new Map<HTMLElement, Viewer>();
+
+  const mountSelected = async () => {
+    const el = document.querySelector<HTMLElement>('.vila-pano .fancybox__slide.is-selected [data-pano]');
+    if (!el || viewers.has(el) || !el.dataset.pano) return;
+    viewers.set(el, { destroy() {} });
+    const [{ Viewer }] = await Promise.all([
+      import('@photo-sphere-viewer/core'),
+      import('@photo-sphere-viewer/core/index.css'),
+    ]);
+    if (!el.isConnected) return;
+    viewers.set(
+      el,
+      new Viewer({
+        container: el,
+        panorama: el.dataset.pano,
+        navbar: ['zoom', 'move', 'fullscreen'],
+        defaultZoomLvl: 10,
+        mousewheelCtrlKey: true,
+        touchmoveTwoFingers: false,
+        loadingTxt: '',
+        lang: document.documentElement.lang.startsWith('cs')
+          ? { zoom: 'Přiblížení', zoomOut: 'Oddálit', zoomIn: 'Přiblížit', moveUp: 'Nahoru', moveDown: 'Dolů', moveLeft: 'Doleva', moveRight: 'Doprava', fullscreen: 'Celá obrazovka', ctrlZoom: 'Přibližujte s klávesou Ctrl a kolečkem myši', twoFingers: 'Posouvejte dvěma prsty' }
+          : {},
+      }),
+    );
+  };
+
+  Fancybox.bind('[data-pano-open]', {
+    l10n: document.documentElement.lang.startsWith('cs') ? csFancybox : en_EN,
+    mainClass: 'vila-fancybox vila-pano',
+    theme: 'dark',
+    placeFocusBack: true,
+    dragToClose: false,
+    zoomEffect: false,
+    idle: false,
+    closeButton: false,
+    showClass: prefersReducedMotion() ? false : 'f-fadeIn',
+    hideClass: prefersReducedMotion() ? false : 'f-fadeOut',
+    Carousel: {
+      gestures: false,
+      Thumbs: false,
+      Toolbar: {
+        enabled: true,
+        display: { left: ['counter'], middle: [], right: ['close'] },
+      },
+      on: { settle: () => void mountSelected() },
+    },
+    on: {
+      ready: () => void mountSelected(),
+      destroy: () => {
+        viewers.forEach((viewer) => viewer.destroy());
+        viewers.clear();
+      },
+    },
+  });
+}
+
 /* -------------------------------------------------------------- boot ---- */
 
 const boot = () => {
@@ -523,6 +590,7 @@ const boot = () => {
   initContactForm();
   initTour();
   initCompare();
+  initPanoramas();
   initCookieConsent();
 };
 

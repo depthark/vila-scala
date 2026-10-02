@@ -33,7 +33,7 @@ export type UnitPhoto = ImageMetadata | { day: ImageMetadata; night: ImageMetada
  * pair-NN-day.avif + pair-NN-night.avif (aligned to the same frame, shown
  * as a before/after slider) and night-NN.avif (night views with no day twin).
  */
-const unitPhotos = import.meta.glob<{ default: ImageMetadata }>('../assets/images/units/*/*.avif', {
+const unitPhotos = import.meta.glob<{ default: ImageMetadata }>('../assets/images/units/*/{pair,night}-*.avif', {
   eager: true,
 });
 
@@ -50,6 +50,25 @@ function dayNight(slug: string): UnitPhoto[] {
     });
   const nights = [...byName].filter(([name]) => /^night-\d+\.avif$/.test(name)).map(([, img]) => img);
   return [...pairs, ...nights];
+}
+
+/** An equirectangular 360° render of the apartment, by day or by night. */
+export interface UnitPanorama {
+  time: 'den' | 'noc';
+  image: ImageMetadata;
+}
+
+/* 360° renders: assets/images/units/<slug>/pano-<den|noc>.avif, produced by
+   `bun run panoramas` from the designers' 360_viz_Byt<N>_<den|noc>.png. */
+const unitPanoramas = import.meta.glob<{ default: ImageMetadata }>('../assets/images/units/*/pano-*.avif', {
+  eager: true,
+});
+
+export function panoramasFor(slug: string): UnitPanorama[] {
+  return Object.entries(unitPanoramas)
+    .filter(([file]) => file.includes(`/units/${slug}/`))
+    .map(([file, mod]) => ({ time: file.includes('pano-noc') ? ('noc' as const) : ('den' as const), image: mod.default }))
+    .sort((a, b) => a.time.localeCompare(b.time));
 }
 
 export type UnitStatus = 'available' | 'soon' | 'sold';

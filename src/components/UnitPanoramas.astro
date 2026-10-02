@@ -1,0 +1,87 @@
+---
+import { Image } from 'astro:assets';
+
+import Icon360 from './Icon360.astro';
+import type { UnitPanorama } from '../data/units';
+import { fmt, t, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  panoramas: UnitPanorama[];
+  /** Unit number as printed, e.g. "1039/3". */
+  unit: string;
+  /** Unit slug, keeps the inline panels' ids unique. */
+  slug: string;
+  index?: string;
+}
+const { locale, panoramas, unit, slug, index } = Astro.props;
+const copy = t(locale).units;
+const label = (time: UnitPanorama['time']) => (time === 'den' ? copy.panoDen : copy.panoNoc);
+---
+
+<!--
+  Equirectangular renders, viewed in Photo Sphere Viewer inside the same
+  Fancybox lightbox as the galleries and the Matterport tour. The cards are
+  plain previews; the viewer (and three.js behind it) is only fetched by
+  app.ts once a visitor opens one.
+-->
+<section aria-labelledby={`pano-${slug}-title`} class="py-20 sm:py-28">
+  <div class="container-page">
+    <p class="reveal meta flex items-center gap-3 text-muted">
+      {index && <span class="text-accent-text">{index}</span>}
+      {index && <span aria-hidden="true" class="h-px w-8 bg-current opacity-40" />}
+      <span>{copy.panoEyebrow}</span>
+    </p>
+    <h2 id={`pano-${slug}-title`} class="mt-5 max-w-4xl text-h2">
+      <span class="reveal-line"><span>{copy.panoTitle}</span></span>
+    </h2>
+    <p class="reveal mt-6 max-w-2xl text-lg text-muted sm:text-xl" data-reveal-delay="120">{copy.panoLead}</p>
+
+    <ul class:list={['mt-10 grid gap-4 sm:mt-14 sm:gap-6', panoramas.length > 1 && 'md:grid-cols-2']}>
+      {
+        panoramas.map((pano, i) => {
+          const id = `pano-${slug}-${pano.time}`;
+          const title = fmt(copy.panoFrameTitle, { unit, time: label(pano.time) });
+          return (
+            <li class="reveal" data-reveal-delay={i * 90}>
+              <a
+                href={pano.image.src}
+                data-pano-open="unit-panoramas"
+                data-src={`#${id}`}
+                data-type="inline"
+                data-caption={title}
+                aria-label={`${copy.panoOpen}: ${title}`}
+                class="button-link group relative block aspect-[16/9] overflow-hidden rounded-card bg-[#0b0908] text-[#f6f2ec]"
+              >
+                <Image
+                  src={pano.image}
+                  alt=""
+                  widths={[640, 960, 1400]}
+                  sizes="(min-width: 768px) 46vw, 92vw"
+                  loading="lazy"
+                  quality={60}
+                  class="absolute inset-0 size-full scale-[1.35] object-cover transition-transform duration-700 ease-[var(--ease-editorial)] group-hover:scale-[1.42] motion-reduce:transition-none"
+                />
+                <span aria-hidden="true" class="absolute inset-0 bg-[linear-gradient(to_top,rgb(11_9_8/0.78),rgb(11_9_8/0.12)_60%)]" />
+                <span class="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-[#0b0908]/70 px-3 py-1.5 text-xs font-medium backdrop-blur-sm">
+                  <Icon360 class="size-4" />
+                  {label(pano.time)}
+                </span>
+                <span class="absolute right-5 bottom-5 left-5 flex items-end justify-between gap-4">
+                  <span class="font-display text-2xl sm:text-3xl">{label(pano.time)}</span>
+                  <span class="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-accent-contrast transition-transform duration-300 group-hover:scale-105">
+                    <Icon360 class="size-5" />
+                    {copy.panoOpen}
+                  </span>
+                </span>
+              </a>
+              <div hidden>
+                <div id={id} class="vs-pano" data-pano={pano.image.src} role="application" aria-label={title} />
+              </div>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
