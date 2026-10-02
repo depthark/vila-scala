@@ -3,7 +3,7 @@ import '../styles/global.css';
 
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import MobileActionBar from '../components/MobileActionBar.astro';
+import ActionBar from '../components/ActionBar.astro';
 import CookieBar from '../components/CookieBar.astro';
 import Seo from '../components/Seo.astro';
 import { t, withBase, type Locale, type RouteKey } from '../i18n';
@@ -90,7 +90,7 @@ const dict = t(locale);
 
     <Footer locale={locale} />
     <CookieBar locale={locale} />
-    <MobileActionBar locale={locale} routeKey={routeKey} />
+    <ActionBar locale={locale} routeKey={routeKey} />
 
     <script>
       import '../scripts/app';

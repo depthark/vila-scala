@@ -8,15 +8,19 @@ interface Props {
   eyebrow?: string;
   title: string;
   subtitle?: string;
+  /** Marks the hero as the section the sticky call to action waits for. */
+  ctaGate?: boolean;
 }
-const { image, alt, eyebrow, title, subtitle } = Astro.props;
+const { image, alt, eyebrow, title, subtitle, ctaGate = true } = Astro.props;
 ---
 
 <!--
   Inner-page banner. Shorter than the homepage hero and always dark, so the
   header can sit over it in the same white-on-photograph state.
 -->
-<section class="relative isolate flex min-h-[clamp(24rem,58svh,38rem)] items-end overflow-hidden bg-[#0b0908] text-[#f6f2ec]">
+<section
+  data-cta-gate={ctaGate || undefined}
+  class="relative isolate flex min-h-[clamp(24rem,58svh,38rem)] items-end overflow-hidden bg-[#0b0908] text-[#f6f2ec]">
   <Image
     src={image}
     alt={alt}

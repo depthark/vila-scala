@@ -115,7 +115,7 @@ const galleryItems = unit.gallery.map((photo, i) => ({
   schema={schema}
   overHero
 >
-  <Hero image={unit.hero} alt={`${heading} — ${c.title}`} eyebrow={heading} title={c.title}>
+  <Hero image={unit.hero} alt={`${heading} — ${c.title}`} eyebrow={heading} title={c.title} ctaGate={false}>
     {
       unit.tourUrl && (
         <div class="reveal mt-8" data-reveal-delay="200">
@@ -139,7 +139,7 @@ const galleryItems = unit.gallery.map((photo, i) => ({
 
   <Breadcrumbs locale={locale} trail={[{ key: 'units' }]} current={`${heading}`} />
 
-  <Section class="pt-10 sm:pt-14" labelledby="unit-overview">
+  <Section class="pt-10 sm:pt-14" labelledby="unit-overview" ctaGate>
     <h2 id="unit-overview" class="sr-only">{dict.units.parameters}</h2>
 
     <div class="grid gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-16">

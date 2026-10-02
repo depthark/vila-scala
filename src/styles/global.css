@@ -421,6 +421,75 @@
 }
 
 /* ---------------------------------------------------------------------- *
+ * Sticky call to action (ActionBar.astro). Hidden below the viewport until
+ * app.ts flags the page as past its key section (and not yet at the
+ * footer), or until the visitor scrolls back up. Only translate moves, and
+ * visibility follows it so the hidden bar is out of the tab order.
+ * ---------------------------------------------------------------------- */
+html {
+  container-type: scroll-state;
+}
+.action-bar {
+  position: fixed;
+  z-index: 40;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 0.5rem 0.5rem max(0.5rem, env(safe-area-inset-bottom));
+  pointer-events: none;
+  translate: 0 calc(100% + 1.5rem);
+  visibility: hidden;
+  transition:
+    translate 0.45s var(--ease-editorial),
+    visibility 0s linear 0.45s;
+}
+.action-bar__panel {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  max-width: 32rem;
+  margin-inline: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-bg) 90%, transparent);
+  box-shadow: 0 18px 40px -18px rgb(20 17 15 / 0.45);
+  backdrop-filter: blur(18px);
+}
+@media (min-width: 64rem) {
+  .action-bar {
+    inset-inline: auto 1.5rem;
+    bottom: 1.5rem;
+    padding: 0;
+  }
+  .action-bar__panel {
+    grid-template-columns: auto auto;
+  }
+}
+html[data-cta-past]:not([data-cta-end]) .action-bar,
+html[data-scroll-up] .action-bar {
+  translate: 0 0;
+  visibility: visible;
+  transition:
+    translate 0.45s var(--ease-editorial),
+    visibility 0s;
+}
+/* Scrolling back up always brings it out, except once back at the very top. */
+@container scroll-state((scrolled: top) and (scrollable: top)) {
+  .action-bar {
+    translate: 0 0;
+    visibility: visible;
+    transition:
+      translate 0.45s var(--ease-editorial),
+      visibility 0s;
+  }
+}
+/* No key section on the page (e.g. 404): nothing to wait for, no bar. */
+body:not(:has([data-cta-gate])) .action-bar {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------- *
  * Day / night before-after slider, shown inside the gallery lightbox.
  * The night photo sits on top, clipped from the left at --pos; app.ts
  * moves --pos from pointer drags and from the (keyboard) range input.

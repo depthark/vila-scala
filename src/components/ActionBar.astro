@@ -1,0 +1,53 @@
+---
+import { site } from '../data/site';
+import { path, t, type Locale, type RouteKey } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  routeKey: RouteKey;
+}
+
+const { locale, routeKey } = Astro.props;
+const dict = t(locale);
+const isDecisionPage = routeKey === 'units' || routeKey === 'unit';
+const primaryHref = isDecisionPage
+  ? path('contact', locale)
+  : routeKey === 'home'
+    ? '#byty'
+    : path('units', locale);
+const primaryLabel = isDecisionPage ? dict.cta.contactUs : dict.cta.viewUnits;
+---
+
+<!--
+  Sticky call to action, kept out of the way until it is useful. It slides in
+  once the page's key section ([data-cta-gate]: the hero, or a unit's
+  overview with its own spec card) has scrolled away and out again as the
+  footer arrives, and it always shows while the visitor scrolls back up.
+  Position is tracked by IntersectionObservers in app.ts; direction by a CSS
+  scroll-state container query, mirrored by a frame-batched passive listener
+  for browsers without it. Only `translate` animates, so it stays on the
+  compositor. The contact page has no bar: it would only point at itself.
+-->
+{
+  routeKey !== 'contact' && (
+    <aside data-action-bar aria-label={`${dict.nav.units} / ${dict.nav.contact}`} class="action-bar no-print">
+      <div class="action-bar__panel">
+        <a
+          href={primaryHref}
+          class="button-link inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-5 text-sm font-medium text-accent-contrast transition-opacity duration-200 hover:opacity-90"
+        >
+          {primaryLabel}
+        </a>
+        <a
+          href={`tel:${site.phone}`}
+          class="button-link inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-line-strong px-5 text-sm font-medium text-text transition-colors duration-200 hover:bg-surface"
+        >
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.33 1.84.56 2.8.69A2 2 0 0 1 22 16.92Z" />
+          </svg>
+          {dict.cta.call}
+        </a>
+      </div>
+    </aside>
+  )
+}

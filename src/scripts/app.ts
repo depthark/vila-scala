@@ -578,6 +578,48 @@ function initPanoramas() {
   });
 }
 
+/* ------------------------------------------------------- action bar ---- */
+
+/* Flags for the sticky call to action (see global.css). Observers fire only
+   when the key section or the footer cross the viewport edge. Scroll
+   direction comes natively from a CSS scroll-state query where `scrolled`
+   is supported; it cannot be feature-tested (older Chromium parses
+   scroll-state containers but not `scrolled`), so a passive, frame-batched
+   listener mirrors it everywhere, touching the DOM only when it flips. */
+function initActionBar() {
+  const gate = document.querySelector('[data-cta-gate]');
+  if (!document.querySelector('[data-action-bar]') || !gate) return;
+  const root = document.documentElement;
+
+  new IntersectionObserver(([entry]) => {
+    root.toggleAttribute('data-cta-past', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+  }).observe(gate);
+
+  const footer = document.querySelector('[data-site-footer]');
+  if (footer) {
+    new IntersectionObserver(([entry]) => root.toggleAttribute('data-cta-end', entry.isIntersecting)).observe(footer);
+  }
+
+  let lastY = window.scrollY;
+  let queued = false;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        const y = window.scrollY;
+        if (Math.abs(y - lastY) < 6) return;
+        const up = y < lastY && y > 8;
+        if (root.hasAttribute('data-scroll-up') !== up) root.toggleAttribute('data-scroll-up', up);
+        lastY = y;
+      });
+    },
+    { passive: true },
+  );
+}
+
 /* -------------------------------------------------------------- boot ---- */
 
 const boot = () => {
@@ -591,6 +633,7 @@ const boot = () => {
   initTour();
   initCompare();
   initPanoramas();
+  initActionBar();
   initCookieConsent();
 };
 

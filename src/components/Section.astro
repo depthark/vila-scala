@@ -5,13 +5,16 @@ interface Props {
   tone?: 'default' | 'surface';
   class?: string;
   labelledby?: string;
+  /** Marks this as the section the sticky call to action waits for. */
+  ctaGate?: boolean;
 }
-const { id, tone = 'default', class: className = '', labelledby } = Astro.props;
+const { id, tone = 'default', class: className = '', labelledby, ctaGate = false } = Astro.props;
 ---
 
 <section
   id={id}
   aria-labelledby={labelledby}
+  data-cta-gate={ctaGate || undefined}
   class:list={[
     'py-20 sm:py-28',
     tone === 'surface' && 'border-y border-line bg-surface',

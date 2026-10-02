@@ -17,7 +17,7 @@ const { locale, eyebrow, titleLines, subtitle, posterAlt, facts } = Astro.props;
 const dict = t(locale);
 ---
 
-<section class="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0908] text-[#f6f2ec]">
+<section data-cta-gate class="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0908] text-[#f6f2ec]">
   <!--
     The poster paints first and is what LCP measures; the loop is fetched
     afterwards by app.ts, and only when the visitor has not asked for
