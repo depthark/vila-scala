@@ -39,7 +39,9 @@ const priceLabel = unit.price
   ? cf.format(unit.price)
   : unit.status === 'soon'
     ? dict.status.soon
-    : dict.units.priceOnRequest;
+    : unit.status === 'sold'
+      ? dict.status.sold
+      : dict.units.priceOnRequest;
 
 const specs = [
   { label: dict.units.layout, value: unit.layout },

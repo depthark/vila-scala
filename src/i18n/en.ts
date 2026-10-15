@@ -80,7 +80,7 @@ const en: typeof cs = {
     price: 'Price',
     layout: 'Layout',
     outdoor: 'Outdoor space',
-    priceOnRequest: 'Price on request',
+    priceOnRequest: 'Info from the agency',
     floorplan: 'Floor plan',
     tourEyebrow: '360° tour',
     tourTitle: 'Walk through the apartment as if you were there',
@@ -293,8 +293,8 @@ const en: typeof cs = {
 
     parkingTitle: 'Garage parking',
     parking: [
-      { name: 'Garage space no. 1', spec: 'for one car', price: 'CZK 990,000' },
-      { name: 'Garage space no. 2', spec: 'for two cars', price: 'CZK 1,690,000' },
+      { name: 'Garage space no. 1', spec: 'for one car', price: 'Info from the agency' },
+      { name: 'Garage space no. 2', spec: 'for two cars', price: 'Info from the agency' },
     ],
     parkingNote:
       'Garage spaces are pre-wired for electric vehicles and can be purchased with an apartment.',

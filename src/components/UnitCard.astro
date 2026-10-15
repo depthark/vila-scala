@@ -22,7 +22,9 @@ const priceLabel = unit.price
       currency: 'CZK',
       maximumFractionDigits: 0,
     }).format(unit.price)
-  : dict.units.priceOnRequest;
+  : unit.status === 'sold'
+    ? dict.status.sold
+    : dict.units.priceOnRequest;
 
 const unitCopy = copy[unit.slug as '1039-1'];
 const heading = `${dict.units.labelUnit} ${unit.number}`;

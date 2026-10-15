@@ -53,6 +53,8 @@ const cf = new Intl.NumberFormat(locale === 'cs' ? 'cs-CZ' : 'en-GB', {
             <td class="py-4 pr-4">
               {u.price ? (
                 <span class="font-medium whitespace-nowrap">{cf.format(u.price)}</span>
+              ) : u.status === 'available' ? (
+                <span class="font-medium whitespace-nowrap">{dict.units.priceOnRequest}</span>
               ) : (
                 <StatusBadge locale={locale} status={u.status} short />
               )}

@@ -78,7 +78,7 @@ export default {
     price: 'Cena',
     layout: 'Dispozice',
     outdoor: 'Venkovní prostory',
-    priceOnRequest: 'Cena na vyžádání',
+    priceOnRequest: 'Info u RK',
     floorplan: 'Půdorys',
     tourEyebrow: '360° prohlídka',
     tourTitle: 'Projděte si byt, jako byste v něm stáli',
@@ -291,8 +291,8 @@ export default {
 
     parkingTitle: 'Garážová stání',
     parking: [
-      { name: 'Garážové stání č. 1', spec: 'pro jedno auto', price: '990 000 Kč' },
-      { name: 'Garážové stání č. 2', spec: 'pro dvě auta', price: '1 690 000 Kč' },
+      { name: 'Garážové stání č. 1', spec: 'pro jedno auto', price: 'Info u RK' },
+      { name: 'Garážové stání č. 2', spec: 'pro dvě auta', price: 'Info u RK' },
     ],
     parkingNote:
       'Garážová stání jsou připravena na elektromobilitu a lze je k bytu přikoupit.',

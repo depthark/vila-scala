@@ -28,7 +28,9 @@ const rows = units.map((u, i) => ({
     ? cf.format(u.price)
     : u.status === 'soon'
       ? `${nf.format(u.areas.floor)} m²`
-      : dict.units.priceOnRequest,
+      : u.status === 'sold'
+        ? '' // the status badge beside it already says so
+        : dict.units.priceOnRequest,
 }));
 ---
 
@@ -80,9 +82,9 @@ const rows = units.map((u, i) => ({
 
           <div class="flex flex-wrap items-center justify-between gap-4 lg:order-4 lg:flex-col lg:items-end lg:justify-center lg:gap-2.5 lg:text-right">
             <StatusBadge locale={locale} status={unit.status} short />
-            <span class="font-display text-2xl whitespace-nowrap text-accent-text lg:text-3xl">
-              {price}
-            </span>
+            {price && (
+              <span class="font-display text-2xl whitespace-nowrap text-accent-text lg:text-3xl">{price}</span>
+            )}
           </div>
         </a>
       </li>
