@@ -9,7 +9,15 @@ import { absolute, withBase } from '../i18n';
 export const GET: APIRoute = () => {
   const sitemap = absolute(withBase('/sitemap-index.xml'));
 
-  return new Response(['User-agent: *', 'Allow: /', '', `Sitemap: ${sitemap}`, ''].join('\n'), {
+  // Training-only agents opt out without blocking Google/Bing or AI search.
+  // This policy works before Cloudflare becomes the authoritative DNS provider.
+  const trainingAgents = ['GPTBot', 'ClaudeBot', 'CCBot', 'Google-Extended', 'Applebot-Extended'];
+  return new Response([
+    'User-agent: *', 'Allow: /', '',
+    ...trainingAgents.map((agent) => `User-agent: ${agent}`),
+    'Disallow: /', '',
+    `Sitemap: ${sitemap}`, '',
+  ].join('\n'), {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   });
 };

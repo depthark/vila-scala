@@ -137,6 +137,32 @@ DKIM, DMARC, autoconfig and autodiscover) when moving nameservers; only the
 website records should point to Cloudflare Pages. Domain registration and
 renewal remain with Webnode.
 
+## SEO, HTTPS and crawler policy
+
+- Every indexable Czech/English page has a unique title and description,
+  canonical URL, reciprocal `hreflang` links (including `x-default`), and
+  Open Graph/Twitter metadata. Apartment previews use their own 1200×630 JPEG.
+- `/robots.txt` advertises `/sitemap-index.xml`; the sitemap includes all
+  22 public pages and their translated URL pairs. The 404 page is `noindex`.
+- JSON-LD describes the website, organization, individual pages, apartment
+  complex, apartments, apartment list and visible breadcrumbs. Unit counts
+  use `QuantitativeValue`; unpublished prices are omitted. The contact page
+  describes a `ContactPage`, without presenting the villa as an estate agency.
+- `public/_headers` adds six-month HSTS for the current host, anti-framing,
+  MIME-sniffing protection, referrer and permissions policies, and a baseline
+  CSP. The CSP restricts embedding, objects and base URLs; it is not a strict
+  script allowlist. Matterport tours and the map remain usable.
+- Hashed `/_astro/` files are cached for one year; HTML continues to
+  revalidate. Pages deployment hosts are `noindex` to avoid duplicate indexing.
+- Cloudflare Pages negotiates gzip/Brotli and redirects HTTP to HTTPS;
+  do not precompress assets or set `Content-Encoding` manually.
+- Cloudflare zone encryption is **Full (Strict)**. AI policies are Search:
+  **Allow**, Agent: **Allow**, Training: **Disallow**, with Bot Preference Sync
+  enabled. This preserves search access while opting out of training.
+  Zone-level controls take effect after the nameserver change. The origin
+  robots.txt already disallows GPTBot, ClaudeBot, CCBot, Google-Extended and
+  Applebot-Extended; robots directives rely on crawler cooperation.
+
 ## Accessibility
 
 Targets WCAG 2.2 AA, verified with Lighthouse (100 on Accessibility, Best

@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 import { LOCALES, DEFAULT_LOCALE } from './src/i18n/locales.mjs';
+import { segments } from './src/i18n/routes.mjs';
 
 /*
  * Cloudflare Pages serves the site at the domain root. SITE and BASE may
@@ -41,6 +42,30 @@ export default defineConfig({
     sitemap({
       i18n: { defaultLocale: DEFAULT_LOCALE, locales: { cs: 'cs-CZ', en: 'en' } },
       filter: (page) => !page.includes('/404'),
+      // The integration cannot infer translated slugs such as /byty/ and
+      // /en/apartments/. Publish the same pairs as the HTML hreflang links.
+      serialize(item) {
+        const base = BASE.replace(/\/$/, '');
+        const pathname = new URL(item.url).pathname.slice(base.length);
+        const parts = pathname.split('/').filter(Boolean);
+        const locale = parts[0] === 'en' ? 'en' : 'cs';
+        if (locale === 'en') parts.shift();
+        const route = Object.entries(segments).find(([key, value]) =>
+          key !== 'unit' && value[locale] === (parts[0] || ''),
+        );
+        if (!route) return item;
+        item.links = LOCALES.map((lang) => {
+          const segment = lang === 'en' ? route[1].en : route[1].cs;
+          const translated = [lang === DEFAULT_LOCALE ? '' : lang, segment, ...parts.slice(1)]
+            .filter(Boolean).join('/');
+          return {
+            lang: lang === 'cs' ? 'cs-CZ' : 'en',
+            url: new URL(`${base}/${translated}${translated ? '/' : ''}`, SITE).href,
+          };
+        });
+        item.links.push({ lang: 'x-default', url: item.links[0].url });
+        return item;
+      },
     }),
   ],
   vite: { plugins: [tailwindcss()] },

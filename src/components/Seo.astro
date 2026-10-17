@@ -1,6 +1,6 @@
 ---
 import { site } from '../data/site';
-import { absolute, alternates, locales, siteRoot, t, type Locale, type RouteKey } from '../i18n';
+import { absolute, alternates, locales, siteRoot, t, withBase, type Locale, type RouteKey } from '../i18n';
 
 interface Props {
   locale: Locale;
@@ -30,8 +30,8 @@ const {
 
 const dict = t(locale);
 const canonical = absolute(Astro.url.pathname);
-const links = alternates(routeKey, slug).map((a) => ({ ...a, href: absolute(a.href) }));
-const ogImage = image ? absolute(image) : undefined;
+const links = noindex ? [] : alternates(routeKey, slug).map((a) => ({ ...a, href: absolute(a.href) }));
+const ogImage = absolute(image ?? withBase('/og/home.jpg'));
 const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 
 const root = siteRoot();
@@ -57,9 +57,19 @@ const graph = [
     '@id': `${root}#website`,
     url: root,
     name: site.name,
-    inLanguage: dict.meta.locale,
+    inLanguage: ['cs-CZ', 'en-GB'],
     publisher: { '@id': `${root}#organization` },
   },
+  ...(!noindex ? [{
+    '@type': routeKey === 'contact' ? 'ContactPage' : routeKey === 'about' ? 'AboutPage' : 'WebPage',
+    '@id': `${canonical}#webpage`,
+    url: canonical,
+    name: fullTitle,
+    description,
+    inLanguage: dict.meta.locale,
+    isPartOf: { '@id': `${root}#website` },
+    primaryImageOfPage: { '@type': 'ImageObject', url: ogImage },
+  }] : []),
   ...schema,
 ];
 ---
@@ -68,7 +78,7 @@ const graph = [
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
 
-{noindex && <meta name="robots" content="noindex, follow" />}
+<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
 
 {links.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 
@@ -85,14 +95,17 @@ const graph = [
 <meta property="og:url" content={canonical} />
 {ogImage && <meta property="og:image" content={ogImage} />}
 {ogImage && <meta property="og:image:alt" content={imageAlt ?? title} />}
+{(!image || image.endsWith('/og/home.jpg')) && <meta property="og:image:width" content="1200" />}
+{(!image || image.endsWith('/og/home.jpg')) && <meta property="og:image:height" content="630" />}
 
 <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
+<meta name="twitter:image:alt" content={imageAlt ?? title} />
 
 <script
   type="application/ld+json"
   is:inline
-  set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}
+  set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')}
 />

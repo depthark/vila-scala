@@ -10,7 +10,7 @@ import SectionHeading from '../components/SectionHeading.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 import { site } from '../data/site';
-import { t, withBase, siteRoot, type Locale } from '../i18n';
+import { t, withBase, type Locale } from '../i18n';
 
 interface Props {
   locale: Locale;
@@ -18,25 +18,6 @@ interface Props {
 const { locale } = Astro.props;
 const dict = t(locale);
 const c = dict.contact;
-
-const schema = [
-  {
-    '@type': 'RealEstateAgent',
-    name: site.name,
-    url: siteRoot(),
-    email: site.email,
-    telephone: site.phone,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: site.street,
-      addressLocality: `${site.city}-${site.district}`,
-      postalCode: site.postalCode,
-      addressCountry: site.country,
-    },
-    geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
-    areaServed: site.city,
-  },
-];
 
 const details = [
   {
@@ -69,7 +50,6 @@ const details = [
   title={c.seoTitle}
   description={c.seoDescription}
   image={withBase("/og/home.jpg")}
-  schema={schema}
   overHero
 >
   <Hero

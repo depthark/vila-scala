@@ -60,9 +60,13 @@ const schema = [
     '@type': 'ApartmentComplex',
     '@id': `${siteRoot()}#project`,
     name: site.name,
+    url: siteRoot(),
+    image: new URL(withBase('/og/home.jpg'), siteRoot()).href,
     description: c.seoDescription,
-    numberOfAccommodationUnits: units.length,
-    numberOfAvailableAccommodationUnits: units.filter((u) => u.status === 'available').length,
+    numberOfAccommodationUnits: { '@type': 'QuantitativeValue', value: units.length },
+    numberOfAvailableAccommodationUnits: {
+      '@type': 'QuantitativeValue', value: units.filter((u) => u.status === 'available').length,
+    },
     address: {
       '@type': 'PostalAddress',
       streetAddress: site.street,

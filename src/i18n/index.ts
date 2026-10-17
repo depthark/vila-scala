@@ -1,6 +1,7 @@
 import cs from './cs';
 import en from './en';
 import { LOCALES, DEFAULT_LOCALE } from './locales.mjs';
+import { segments } from './routes.mjs';
 
 export type Locale = 'cs' | 'en';
 export const locales = LOCALES as readonly Locale[];
@@ -22,24 +23,7 @@ export function fmt(template: string, values: Record<string, string | number>): 
 }
 
 /** Every page of the site, with its localised path segment. */
-export type RouteKey =
-  | 'home'
-  | 'about'
-  | 'units'
-  | 'unit'
-  | 'documents'
-  | 'pricing'
-  | 'contact';
-
-const segments: Record<RouteKey, Record<Locale, string>> = {
-  home: { cs: '', en: '' },
-  about: { cs: 'o-nas', en: 'about' },
-  units: { cs: 'byty', en: 'apartments' },
-  unit: { cs: 'byty', en: 'apartments' },
-  documents: { cs: 'dokumentace', en: 'documents' },
-  pricing: { cs: 'cenik', en: 'pricing' },
-  contact: { cs: 'kontakt', en: 'contact' },
-};
+export type RouteKey = keyof typeof segments;
 
 /**
  * Prefix a root-relative URL with the deployment base path, so the same

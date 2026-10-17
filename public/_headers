@@ -1,0 +1,19 @@
+# Pages applies these even while authoritative DNS remains at Webnode.
+/*
+  Strict-Transport-Security: max-age=15552000
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# Only content-hashed Astro assets can safely stay cached for a year.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Keep the production domain as the only indexed copy.
+https://vila-scala.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.vila-scala.pages.dev/*
+  X-Robots-Tag: noindex
