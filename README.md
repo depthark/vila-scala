@@ -17,7 +17,7 @@ site as a static, bilingual, accessible Astro project.
 | Runtime / package manager | [Bun](https://bun.sh) for installs and scripts; Node 24 LTS (`.nvmrc`) runs the Astro CLI |
 | Images | `astro:assets` + sharp — AVIF/WebP, responsive `srcset`, build-time |
 | Fonts | Self-hosted Manrope (display, from Google Fonts) + Inter Variable (UI) |
-| Hosting | GitHub Pages via GitHub Actions |
+| Hosting | Cloudflare Pages via Git integration |
 
 The client-side budget is one small module: theme persistence, the mobile
 menu, a scroll reveal, the hero video controller, the lightbox and form
@@ -104,28 +104,33 @@ For static files under `public/`, wrap the URL in `withBase()`.
 
 ## Deployment
 
-Pushing to `main` runs `.github/workflows/static.yml`: Node LTS + Bun setup → install →
-type-check → build → publish to GitHub Pages. It can also be triggered by
-hand from the Actions tab.
+Pushing to `main` deploys the `depthark/vila-scala` repository through the
+Cloudflare Pages project `vila-scala`. GitHub Actions checks the build separately
+and no longer publishes to GitHub Pages.
 
-**One-time setup:** Settings → Pages → *Source: GitHub Actions*.
+Cloudflare Pages settings:
 
-The build reads `SITE` and `BASE` from the environment, which the workflow
-fills from `actions/configure-pages`. That is what makes one source tree
-deploy correctly both to the project page
-(`https://luko248.github.io/vila-scala/`, base `/vila-scala`) and to a custom
-domain (base `/`) without editing anything.
+- Production branch: `main`
+- Build system: version 3
+- Build command: `bun run build` (type-check and production build)
+- Output directory: `dist`
+- Root directory: repository root
+- Node version: numeric version in `.nvmrc`; Cloudflare cannot use `lts/krypton`
+- Bun version: `packageManager` in `package.json`
+- Custom domains: `www.vila-scala.cz` and `vila-scala.cz`
+
+The production origin defaults to `https://www.vila-scala.cz` and the base path
+to `/`. `SITE` and `BASE` can override these for local verification. Do not set
+a GitHub project base path on Cloudflare.
 
 Never hard-code an absolute URL in a template: use `absolute()` or
-`siteRoot()` from `src/i18n`, which resolve against whichever origin the
-build is actually targeting. Canonicals, hreflang, `og:image`, robots and
-every JSON-LD `@id` go through them.
+`siteRoot()` from `src/i18n`. Canonicals, hreflang, `og:image`, robots and
+JSON-LD all resolve against the configured production origin.
 
-**Custom domain:** add `public/CNAME` containing `www.vila-scala.cz`, then set
-the domain under Settings → Pages. `BASE` then resolves to `/` on its own.
-
-The output is a plain static directory, so `dist/` also drops onto Cloudflare
-Pages unchanged (build command `bun run build:ci`, output directory `dist`).
+DNS is managed in Cloudflare. Preserve the Webnode mail records (MX, SPF,
+DKIM, DMARC, autoconfig and autodiscover) when moving nameservers; only the
+website records should point to Cloudflare Pages. Domain registration and
+renewal remain with Webnode.
 
 ## Accessibility
 

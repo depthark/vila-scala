@@ -6,9 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 import { LOCALES, DEFAULT_LOCALE } from './src/i18n/locales.mjs';
 
 /*
- * Deployment target. GitHub Actions injects SITE/BASE from
- * `actions/configure-pages`, so the same build works at the custom domain
- * (base "/") and at https://<user>.github.io/<repo>/ (base "/<repo>").
+ * Cloudflare Pages serves the site at the domain root. SITE and BASE may
+ * be overridden for local verification; production uses www.vila-scala.cz.
  */
 const SITE = process.env.SITE || 'https://www.vila-scala.cz';
 const BASE = process.env.BASE && process.env.BASE !== '' ? process.env.BASE : '/';
