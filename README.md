@@ -117,7 +117,9 @@ Cloudflare Pages settings:
 - Root directory: repository root
 - Node version: numeric version in `.nvmrc`; Cloudflare cannot use `lts/krypton`
 - Bun version: `packageManager` in `package.json`
-- Custom domains: `www.vila-scala.cz` and `vila-scala.cz`
+- Custom domain: `www.vila-scala.cz`
+- Cloudflare redirect: `vila-scala.cz` → `https://www.vila-scala.cz`,
+  preserving paths and query strings (effective once nameservers move)
 
 The production origin defaults to `https://www.vila-scala.cz` and the base path
 to `/`. `SITE` and `BASE` can override these for local verification. Do not set
@@ -127,7 +129,10 @@ Never hard-code an absolute URL in a template: use `absolute()` or
 `siteRoot()` from `src/i18n`. Canonicals, hreflang, `og:image`, robots and
 JSON-LD all resolve against the configured production origin.
 
-DNS is managed in Cloudflare. Preserve the Webnode mail records (MX, SPF,
+The Cloudflare DNS zone is prepared; activation requires Webnode support to
+change the nameservers to `lloyd.ns.cloudflare.com` and
+`michelle.ns.cloudflare.com`. The `www` CNAME at Webnode also points directly
+to `vila-scala.pages.dev` during the transition. Preserve the Webnode mail records (MX, SPF,
 DKIM, DMARC, autoconfig and autodiscover) when moving nameservers; only the
 website records should point to Cloudflare Pages. Domain registration and
 renewal remain with Webnode.
