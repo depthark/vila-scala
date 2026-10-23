@@ -380,6 +380,13 @@ const en: typeof cs = {
     formSuccess:
       'We have opened a pre-filled email for you. If nothing happened, please write to info@vila-scala.cz directly.',
     formSubject: 'Enquiry from the Vila SCALA website',
+    formIntroApi: 'Fill in the form and we will get back to you as soon as we can.',
+    formSending: 'Sending…',
+    formSent: 'Thank you, your message has been sent.',
+    formError: 'Your message could not be sent. Please try again, or write to info@vila-scala.cz directly.',
+    thanksTitle: 'Thank you for your message',
+    thanksBody: 'We have received your message and will get back to you as soon as we can, by email or phone.',
+    thanksClose: 'Close',
   },
 
   notFound: {

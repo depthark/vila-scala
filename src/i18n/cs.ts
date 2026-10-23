@@ -379,6 +379,14 @@ export default {
     formSuccess:
       'Otevřeli jsme vám předvyplněný e-mail. Pokud se nic nestalo, napište nám prosím přímo na info@vila-scala.cz.',
     formSubject: 'Dotaz z webu Vila SCALA',
+    formIntroApi: 'Vyplňte formulář a ozveme se vám co nejdříve.',
+    formSending: 'Odesílám…',
+    formSent: 'Děkujeme, zpráva byla odeslána.',
+    formError:
+      'Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo nám napište přímo na info@vila-scala.cz.',
+    thanksTitle: 'Děkujeme za zprávu',
+    thanksBody: 'Vaši zprávu jsme přijali. Ozveme se vám co nejdříve na uvedený e-mail nebo telefon.',
+    thanksClose: 'Zavřít',
   },
 
   notFound: {
