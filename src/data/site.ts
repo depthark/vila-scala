@@ -16,11 +16,4 @@ export const site = {
   virtualTourUrl: 'https://my.matterport.com/show/?m=HrbBwzj2ryq',
   foundingYear: 2024,
   lawFirm: 'Krejčí, Rajf & partneři, s.r.o.',
-  /**
-   * Web3Forms access key, embedded in the form as on anewstyle.cz. It is public
-   * by design and delivers to the address it was created for, which must be
-   * info@vila-scala.cz. While it is empty the contact form falls back to
-   * opening the visitor's mail app.
-   */
-  web3formsKey: '' as string,
 } as const;

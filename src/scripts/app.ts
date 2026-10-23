@@ -273,51 +273,6 @@ function initContactForm() {
   const summary = form.querySelector<HTMLElement>('[data-form-errors]');
   const summaryList = form.querySelector<HTMLElement>('[data-form-errors-list]');
   const status = form.querySelector<HTMLElement>('[data-form-status]');
-  const submitButton = form.querySelector<HTMLButtonElement>('[data-form-submit]');
-  const thanks = document.querySelector<HTMLDialogElement>('[data-contact-thanks]');
-
-  const setStatus = (state: 'sent' | 'error' | null, text = '') => {
-    if (!status) return;
-    status.hidden = !state;
-    if (state) status.dataset.state = state;
-    else delete status.dataset.state;
-    status.textContent = text;
-  };
-
-  /* Web3Forms, the same API as on anewstyle.cz: the message is delivered to
-     the address the access key belongs to (info@vila-scala.cz), the hidden
-     botcheck field filters bots, and the visitor stays on the page. */
-  let sending = false;
-  const sendViaWeb3Forms = async () => {
-    if (sending) return;
-    sending = true;
-    setStatus(null);
-    if (submitButton) {
-      submitButton.dataset.loading = 'true';
-      submitButton.textContent = form.dataset.statusSending ?? '';
-    }
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: new FormData(form),
-      });
-      const result = (await response.json().catch(() => ({}))) as { success?: boolean };
-      if (!response.ok || !result.success) throw new Error('Web3Forms rejected the message');
-      form.reset();
-      setStatus('sent', form.dataset.statusSent);
-      thanks?.showModal();
-    } catch {
-      setStatus('error', form.dataset.statusError);
-      status?.focus();
-    } finally {
-      sending = false;
-      if (submitButton) {
-        delete submitButton.dataset.loading;
-        submitButton.textContent = submitButton.dataset.label ?? '';
-      }
-    }
-  };
 
   const setFieldError = (field: HTMLInputElement | HTMLTextAreaElement, message: string | null) => {
     const errorEl = form.querySelector<HTMLElement>(`[data-error-for="${field.name}"]`);
@@ -374,11 +329,6 @@ function initContactForm() {
 
     if (errors.length) {
       summary?.focus();
-      return;
-    }
-
-    if (form.dataset.mode === 'web3forms') {
-      void sendViaWeb3Forms();
       return;
     }
 
