@@ -22,5 +22,5 @@ export const site = {
    * info@vila-scala.cz. While it is empty the contact form falls back to
    * opening the visitor's mail app.
    */
-  web3formsKey: 'f48bcfa0-bfd9-4098-9a68-6116fd0b952f' as string,
+  web3formsKey: '' as string,
 } as const;
